@@ -1,8 +1,8 @@
 
 ### Create and test images
-sudo docker stop my_tensorflow_app && sudo docker rm my_tensorflow_app && sudo docker rmi --force my_tensorflow_app && sudo docker build -t my_tensorflow_app . && sudo docker run --gpus all --cpus=2 --memory=12g --name my_tensorflow_app  my_tensorflow_app
+sudo docker stop my_tensorflow_app && sudo docker rm my_tensorflow_app && sudo docker rmi --force my_tensorflow_app && sudo docker build -t my_tensorflow_app . && sudo docker run --gpus all --cpus=2 --memory=10g --name my_tensorflow_app  my_tensorflow_app
 
-### docker clean up
+### docker clean up, after removing all containers
 sudo docker system prune -a --volumes
 
 ## Docker server
@@ -56,3 +56,13 @@ kubectl get pods --all-namespaces
 
 # Reset on both machine
 sudo kubeadm reset
+
+# apply deployment
+/Documents/work/Machine_Learning/machine_learning$ kubectl create -f  model_selection.yaml 
+kubectl exec -it model-selection-57d7f6748f-rgb6h -- /bin/bash
+
+# install nvidia drivers
+sudo apt install nvidia-driver-525 nvidia-dkms-525
+reboot
+#check install
+nvidia-smi

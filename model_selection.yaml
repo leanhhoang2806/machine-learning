@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-selection
+  labels:
+    app: model-selection
+spec:
+  selector:
+    matchLabels:
+      app: model-selection
+  template:
+    metadata:
+      name: model-selection-pod
+      labels:
+        app: model-selection
+    spec:
+      containers:
+      - name: my-tensorflow-app-container
+        image: my_tensorflow_app
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: "2"
+            memory: "10Gi"
+            nvidia.com/gpu: "1"
+        command: ["docker", "run", "--gpus", "all" , "--cpus=2", "--memory=10g", "--name", "my_tensorflow_app",  "my_tensorflow_app"]
