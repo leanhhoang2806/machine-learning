@@ -1,0 +1,58 @@
+
+### Create and test images
+sudo docker stop my_tensorflow_app && sudo docker rm my_tensorflow_app && sudo docker rmi --force my_tensorflow_app && sudo docker build -t my_tensorflow_app . && sudo docker run --gpus all --cpus=2 --memory=12g --name my_tensorflow_app  my_tensorflow_app
+
+### docker clean up
+sudo docker system prune -a --volumes
+
+## Docker server
+sudo systemctl start docker-desktop
+sudo systemctl restart docker
+
+
+
+#### Monitoring
+nvtop 
+htop
+
+### Seting up home server
+nmap -p 22 --open 192.168.1.0/24
+ssh hoang2@192.168.1.101
+
+# On master machine
+709  sudo swapoff -a
+  710  sudo nano /etc/fstab
+  711  sudp apt install docker.io -y
+  712  sudo apt install docker.io -y
+  713  sudo apt-get remove containerd.io
+  714  sudo apt install docker.io -y
+  715  curl -fsSL https://dl.k8s.io/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+  716  echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  717  sudo apt-get update
+  718  sudo apt-get install -y kubelet kubeadm kubectl
+  719  sudo apt-get install -y kubelet kubeadm kubectl kubernetes-cni -y
+  720  sudo kubeadm init
+  721  mkdir -p $HOME/.kube
+  722  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  723  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  724  kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  725  kubectl get nodes
+
+if service keep crashing do this
+https://github.com/kubernetes/kubernetes/issues/110177#issuecomment-1161647736
+
+# set up cgroup
+738  sudo docker info | grep Cgroup
+ Cgroup Driver: systemd
+ Cgroup Version: 2
+sudo nano /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+=> add a flag `--cgroup-driver=systemd` to this line
+Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --cgroup-driver=systemd"
+
+# debugtool
+kubectl get pods --all-namespaces
+
+# On slave machine install everything till 719 then install the `sudo kubeadm join` command from master
+
+# Reset on both machine
+sudo kubeadm reset
