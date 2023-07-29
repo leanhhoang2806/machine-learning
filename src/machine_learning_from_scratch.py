@@ -8,7 +8,23 @@ from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Conv
 import time
 from sklearn.model_selection import KFold
 import paramiko
+import subprocess
 
+def start_tensorboard(logdir, port=6006):
+    try:
+        # Start TensorBoard using the subprocess module
+        cmd = f"tensorboard --logdir={logdir} --port={port}"
+        subprocess.Popen(cmd, shell=True)
+
+        print(f"TensorBoard started at http://localhost:{port}/")
+    except Exception as e:
+        print(f"Error starting TensorBoard: {e}")
+
+# Replace '/path/to/your/logdir' with the actual directory where your TensorFlow logs are stored
+logdir = '/app/src/logs'
+# You can specify a different port number if the default (6006) is already in use
+port = 6006
+start_tensorboard(logdir, port)
 
 # Function to start the TensorFlow worker on a remote machine
 def start_worker(hostname, username, private_key_path, passphrase):
@@ -17,6 +33,14 @@ def start_worker(hostname, username, private_key_path, passphrase):
 
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh_client.connect(hostname, username=username, pkey=private_key)
+    ssh_client.exec_command(f'cd ~/Documents/work/machine-learning && \
+                            git pull && sudo docker stop my_tensorflow_app | true && \
+                            sudo docker rm my_tensorflow_app | true && \
+                            sudo docker rmi --force my_tensorflow_app && \
+                            sudo docker build -t my_tensorflow_app . && \
+                            sudo docker run -v ~/.ssh:/root/.ssh --gpus all --cpus=2 --memory=10g --name my_tensorflow_app  my_tensorflow_app\
+                            ')
+
 
 # Check if GPU is available and enable GPU memory growth to avoid allocation errors
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -92,9 +116,6 @@ start_time = time.time()
 master_ip = '192.168.1.100'
 worker_ip = '192.168.1.101'
 
-# Start TensorFlow worker on the worker node (assuming passwordless SSH is set up)
-start_worker(worker_ip, 'hoang2', private_key_path='/root/.ssh/master_node_id_rsa', passphrase='2910')
-
 # Define the cluster_spec with master and worker tasks
 cluster_spec = tf.train.ClusterSpec({
     'master': [f'{master_ip}:2222'],
@@ -106,6 +127,14 @@ server = tf.distribute.Server(cluster_spec, job_name='master', task_index=0)
 
 # Create the strategy based on the server
 strategy = tf.distribute.MultiWorkerMirroredStrategy()
+# Get the task type and task ID for this node
+task_type, task_id = server.target.split(',')[0].split(':')
+# Print the task information
+print(f'Task type: {task_type}, Task ID: {task_id}')
+if task_type == 'master':
+    # Start TensorFlow worker on the worker node (assuming passwordless SSH is set up)
+    start_worker(worker_ip, 'hoang2', private_key_path='/root/.ssh/master_node_id_rsa', passphrase='2910')
+
 
 # Perform cross-validation and evaluate models
 model_accuracies = []
