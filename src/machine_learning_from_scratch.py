@@ -15,8 +15,6 @@ def build_model():
     ])
 
 def train_model():
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-    x_train, x_test = x_train / 255.0, x_test / 255.0
 
     cluster_spec = {
         "worker": [
@@ -33,6 +31,8 @@ def train_model():
     strategy = tf.distribute.MultiWorkerMirroredStrategy()
 
     with strategy.scope():
+        (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+        x_train, x_test = x_train / 255.0, x_test / 255.0
         model = build_model()
         model.compile(optimizer='adam',
                     loss='sparse_categorical_crossentropy',
