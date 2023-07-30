@@ -45,6 +45,8 @@ sudo pt-get install -y openssh-client
   723  sudo chown $(id -u):$(id -g) $HOME/.kube/config
   724  kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
   725  kubectl get nodes
+# debugtool
+kubectl get pods --all-namespaces
 
 if service keep crashing do this
 https://github.com/kubernetes/kubernetes/issues/110177#issuecomment-1161647736
@@ -57,8 +59,6 @@ sudo nano /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 => add a flag `--cgroup-driver=systemd` to this line
 Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --cgroup-driver=systemd"
 
-# debugtool
-kubectl get pods --all-namespaces
 
 # On slave machine install everything till 719 then install the `sudo kubeadm join` command from master
 

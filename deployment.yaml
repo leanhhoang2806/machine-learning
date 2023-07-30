@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorflow-deployment
+spec:
+  replicas: 1  # You can set the desired number of replicas/pods here
+  selector:
+    matchLabels:
+      app: tensorflow-app
+  template:
+    metadata:
+      labels:
+        app: tensorflow-app
+    spec:
+      containers:
+      - name: tensorflow-container
+        image: my_tensorflow_app  # Replace with your TensorFlow image and tag
+        resources:
+          limits:
+            nvidia.com/gpu: 1  # Request 2 GPUs
+          requests:
+            nvidia.com/gpu: 1  # Allocate 2 GPUs
+        command: ["python"]
+        args: ["-m", "src.distributed_training_test"]  # Replace with the actual name of your script

@@ -28,10 +28,11 @@ COPY . .
 # Install dependencies from requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONPATH="${PYTHONPATH}:/app/src"
+
 # Expose port 2222 for master node to access
-# EXPOSE 2222
+EXPOSE 2222
 
 # Set the entry point to run main.py when the container starts
-ENTRYPOINT ["python", "-m", "src.machine_learning_from_scratch"]
-# ENTRYPOINT ["python", "-m", "src.distributed_training_test"]
+# ENTRYPOINT ["python", "-m", "src.machine_learning_from_scratch"]
+ENTRYPOINT ["python", "-m", "src.distributed_training_test"]
 # ENTRYPOINT [ "ls", "-la", "/root/.ssh/" ]
