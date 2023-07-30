@@ -27,6 +27,7 @@ COPY . .
 
 # Install dependencies from requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+RUN unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
 ENV PYTHONPATH="${PYTHONPATH}:/app/src"
 # Expose port 2222 for master node to access
 EXPOSE 2222
