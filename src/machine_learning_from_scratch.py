@@ -2,6 +2,11 @@ import os
 import tensorflow as tf
 import json
 
+
+physical_devices = tf.config.list_physical_devices('GPU')
+if physical_devices:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
 def build_model():
     return tf.keras.Sequential([
         tf.keras.layers.Dense(64, activation='relu', input_shape=(784,)),
@@ -29,10 +34,9 @@ def train_model():
 
     with strategy.scope():
         model = build_model()
-
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
+        model.compile(optimizer='adam',
+                    loss='sparse_categorical_crossentropy',
+                    metrics=['accuracy'])
 
     model.fit(x_train, y_train, epochs=10, batch_size=64)
 
