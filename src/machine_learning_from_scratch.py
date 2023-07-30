@@ -9,12 +9,15 @@ def build_model():
         tf.keras.layers.Dense(10, activation='softmax')
     ])
 
-def train_model(worker_ip):
+def train_model():
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
 
     cluster_spec = {
-        "worker": ["{}:2222".format(worker_ip)]
+        "worker": [
+            "{}:2222".format('192.168.1.100'),
+            "{}:2222".format('192.168.1.101'),
+            ]
     }
 
     os.environ["TF_CONFIG"] = json.dumps({
@@ -34,5 +37,4 @@ def train_model(worker_ip):
     model.fit(x_train, y_train, epochs=10, batch_size=64)
 
 if __name__ == "__main__":
-    worker_ip = '192.168.1.101'
-    train_model(worker_ip)
+    train_model()
