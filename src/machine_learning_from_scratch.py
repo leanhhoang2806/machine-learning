@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -83,32 +82,32 @@ with strategy.scope():
     for name, model in models:
         kfold = KFold(n_splits=n_splits, shuffle=True, random_state=42)
         scores = []
-        for train_index, val_index in kfold.split(data_generator):
-                train_data = tf.data.Dataset.from_generator(
-                    lambda: ((data_generator[i][0], data_generator[i][1])for i in train_index),
-                    output_signature=(
-                        tf.TensorSpec(shape=(None, image_width, image_height, 3), dtype=tf.float32),
-                        tf.TensorSpec(shape=(None, data_generator.num_classes), dtype=tf.float32)
-                    )
-                ).repeat().prefetch(buffer_size=tf.data.AUTOTUNE)
+        for train_index, val_index in kfold.split(data_generator.filenames):  # Modified here
+            train_data = tf.data.Dataset.from_tensor_slices((data_generator.filenames[train_index], data_generator.classes[train_index]))  # Modified here
+            train_data = train_data.map(lambda x, y: (datagen.image_shape + (3,), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            train_data = train_data.map(lambda x, y: (tf.io.read_file(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            train_data = train_data.map(lambda x, y: (tf.image.decode_jpeg(x, channels=3), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            train_data = train_data.map(lambda x, y: (tf.image.resize(x, (image_width, image_height)), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            train_data = train_data.batch(batch_size).repeat().prefetch(buffer_size=tf.data.experimental.AUTOTUNE)  # Modified here
 
-                val_data = tf.data.Dataset.from_generator(
-                    lambda: ((data_generator[i][0], data_generator[i][1]) for i in val_index),
-                    output_signature=(
-                        tf.TensorSpec(shape=(None, image_width, image_height, 3), dtype=tf.float32),
-                        tf.TensorSpec(shape=(None, data_generator.num_classes), dtype=tf.float32)
-                    )
-                ).prefetch(buffer_size=tf.data.AUTOTUNE)
-                model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-                # Calculate the number of steps for each epoch
-                steps_per_epoch = len(train_index) // batch_size
-                validation_steps = len(val_index) // batch_size
-                print(f"Training {name} with {steps_per_epoch} steps per epoch and {validation_steps} validation steps per epoch")
-        model.fit(train_data, epochs=10, steps_per_epoch=steps_per_epoch,
-                  validation_data=val_data, validation_steps=validation_steps, verbose=0)
-        
-        _, accuracy = model.evaluate(val_data)
-        scores.append(accuracy)
+            val_data = tf.data.Dataset.from_tensor_slices((data_generator.filenames[val_index], data_generator.classes[val_index]))  # Modified here
+            val_data = val_data.map(lambda x, y: (datagen.image_shape + (3,), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            val_data = val_data.map(lambda x, y: (tf.io.read_file(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            val_data = val_data.map(lambda x, y: (tf.image.decode_jpeg(x, channels=3), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            val_data = val_data.map(lambda x, y: (tf.image.resize(x, (image_width, image_height)), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)  # Modified here
+            val_data = val_data.batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)  # Modified here
+
+            model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+            # Calculate the number of steps for each epoch
+            steps_per_epoch = len(train_index) // batch_size
+            validation_steps = len(val_index) // batch_size
+            print(f"Training {name} with {steps_per_epoch} steps per epoch and {validation_steps} validation steps per epoch")
+
+            model.fit(train_data, epochs=10, steps_per_epoch=steps_per_epoch,
+                      validation_data=val_data, validation_steps=validation_steps, verbose=0)
+
+            _, accuracy = model.evaluate(val_data)
+            scores.append(accuracy)
 
         mean_accuracy = np.mean(scores)
         model_accuracies.append((name, mean_accuracy))
