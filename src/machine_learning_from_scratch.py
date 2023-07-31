@@ -87,7 +87,7 @@ with strategy.scope():
             train_classes = [data_generator.classes[i] for i in train_index]
             train_classes_onehot = tf.one_hot(train_classes, depth=data_generator.num_classes)  # Convert class labels to one-hot encoded format
             train_data = tf.data.Dataset.from_tensor_slices((train_filenames, train_classes_onehot))
-            train_data = train_data.map(lambda x, y: (tf.io.read_file(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+            train_data = train_data.map(lambda x, y: (tf.io.read_file(data_directory + x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.map(lambda x, y: (tf.image.decode_jpeg(x, channels=3), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.map(lambda x, y: (tf.image.resize(x, (image_width, image_height)), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.cache()  # Cache the preprocessed data
@@ -97,7 +97,7 @@ with strategy.scope():
             val_classes = [data_generator.classes[i] for i in val_index]
             val_classes_onehot = tf.one_hot(val_classes, depth=data_generator.num_classes)  # Convert class labels to one-hot encoded format
             val_data = tf.data.Dataset.from_tensor_slices((val_filenames, val_classes_onehot))
-            val_data = val_data.map(lambda x, y: (tf.io.read_file(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+            val_data = val_data.map(lambda x, y: (tf.io.read_file(data_directory + x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             val_data = val_data.map(lambda x, y: (tf.image.decode_jpeg(x, channels=3), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             val_data = val_data.map(lambda x, y: (tf.image.resize(x, (image_width, image_height)), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             val_data = val_data.cache()  # Cache the preprocessed data
