@@ -85,20 +85,23 @@ with strategy.scope():
         for train_index, val_index in kfold.split(data_generator.filenames):  # Modified here
             train_filenames = [data_generator.filenames[i] for i in train_index]
             train_classes = [data_generator.classes[i] for i in train_index]
-            train_data = tf.data.Dataset.from_tensor_slices((train_filenames, train_classes))
+            train_classes_onehot = tf.one_hot(train_classes, depth=data_generator.num_classes)  # Convert class labels to one-hot encoded format
+            train_data = tf.data.Dataset.from_tensor_slices((train_filenames, train_classes_onehot))
             train_data = train_data.map(lambda x, y: (tf.io.read_file(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.map(lambda x, y: (tf.image.decode_jpeg(x, channels=3), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.map(lambda x, y: (tf.image.resize(x, (image_width, image_height)), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+            train_data = train_data.cache()  # Cache the preprocessed data
             train_data = train_data.batch(batch_size).repeat().prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
             val_filenames = [data_generator.filenames[i] for i in val_index]
             val_classes = [data_generator.classes[i] for i in val_index]
-            val_data = tf.data.Dataset.from_tensor_slices((val_filenames, val_classes))
+            val_classes_onehot = tf.one_hot(val_classes, depth=data_generator.num_classes)  # Convert class labels to one-hot encoded format
+            val_data = tf.data.Dataset.from_tensor_slices((val_filenames, val_classes_onehot))
             val_data = val_data.map(lambda x, y: (tf.io.read_file(x), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             val_data = val_data.map(lambda x, y: (tf.image.decode_jpeg(x, channels=3), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
             val_data = val_data.map(lambda x, y: (tf.image.resize(x, (image_width, image_height)), y), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+            val_data = val_data.cache()  # Cache the preprocessed data
             val_data = val_data.batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-
 
 
             model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
