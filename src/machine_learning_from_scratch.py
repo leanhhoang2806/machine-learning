@@ -96,7 +96,9 @@ with strategy.scope():
         for train_index, val_index in kfold.split(data_generator.filenames):  # Modified here
             train_filenames = [data_generator.filenames[i] for i in train_index]
             train_classes = [data_generator.classes[i] for i in train_index]
+            print("Train classes shape:", np.array(train_classes).shape) 
             train_classes_onehot = tf.one_hot(train_classes, depth=data_generator.num_classes)  # Convert class labels to one-hot encoded format
+            print("Train classes one-hot shape:", train_classes_onehot.shape)  # Debug print to check the train classes one-hot shape
             train_data = tf.data.Dataset.from_tensor_slices((train_filenames, train_classes_onehot))
             train_data = train_data.map(preprocess_image, num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.cache()  # Cache the preprocessed data
