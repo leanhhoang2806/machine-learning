@@ -14,8 +14,6 @@ def preprocess_image(image_path, label):
     image = tf.image.decode_jpeg(image, channels=3)
     image = tf.image.resize(image, (image_width, image_height))
     image = tf.image.convert_image_dtype(image, tf.float32)
-    label = tf.cast(label, tf.int32)
-    label = tf.one_hot(label, depth=data_generator.num_classes)
     print("Label shape:", label.shape)
     return image, label
 # Check if GPU is available and enable GPU memory growth to avoid allocation errors
@@ -96,18 +94,14 @@ with strategy.scope():
         for train_index, val_index in kfold.split(data_generator.filenames):  # Modified here
             train_filenames = [data_generator.filenames[i] for i in train_index]
             train_classes = [data_generator.classes[i] for i in train_index]
-            print("Train classes shape:", np.array(train_classes).shape) 
-            train_classes_onehot = tf.one_hot(train_classes, depth=data_generator.num_classes)  # Convert class labels to one-hot encoded format
-            print("Train classes one-hot shape:", train_classes_onehot.shape)  # Debug print to check the train classes one-hot shape
-            train_data = tf.data.Dataset.from_tensor_slices((train_filenames, train_classes_onehot))
+            train_data = tf.data.Dataset.from_tensor_slices((train_filenames, train_classes))
             train_data = train_data.map(preprocess_image, num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.cache()  # Cache the preprocessed data
             train_data = train_data.batch(batch_size).repeat().prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
             val_filenames = [data_generator.filenames[i] for i in val_index]
             val_classes = [data_generator.classes[i] for i in val_index]
-            val_classes_onehot = tf.one_hot(val_classes, depth=data_generator.num_classes)  # Convert class labels to one-hot encoded format
-            val_data = tf.data.Dataset.from_tensor_slices((val_filenames, val_classes_onehot))
+            val_data = tf.data.Dataset.from_tensor_slices((val_filenames, val_classes))
             val_data = val_data.map(preprocess_image, num_parallel_calls=tf.data.experimental.AUTOTUNE)
             val_data = val_data.cache()  # Cache the preprocessed data
             val_data = val_data.batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
