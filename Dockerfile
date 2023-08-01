@@ -27,7 +27,6 @@ COPY . .
 
 # Install dependencies from requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-RUN unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
 ENV PYTHONPATH="${PYTHONPATH}:/app/src"
 
 # Set the entry point to run main.py when the container starts
