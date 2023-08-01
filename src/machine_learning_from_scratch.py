@@ -14,6 +14,8 @@ def preprocess_image(image_path, label):
     image = tf.image.decode_jpeg(image, channels=3)
     image = tf.image.resize(image, (image_width, image_height))
     image = tf.image.convert_image_dtype(image, tf.float32)
+    label = tf.cast(label, tf.int32)
+    label = tf.one_hot(tf.squeeze(label), depth=4)
     print("Label shape:", label.shape)
     return image, label
 # Check if GPU is available and enable GPU memory growth to avoid allocation errors
