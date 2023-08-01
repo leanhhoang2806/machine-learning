@@ -16,6 +16,7 @@ def preprocess_image(image_path, label):
     image = tf.image.convert_image_dtype(image, tf.float32)
     label = tf.cast(label, tf.int32)
     label = tf.one_hot(label, depth=data_generator.num_classes)
+    print("Label shape:", label.shape)
     return image, label
 # Check if GPU is available and enable GPU memory growth to avoid allocation errors
 physical_devices = tf.config.list_physical_devices('GPU')
