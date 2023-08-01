@@ -98,6 +98,8 @@ with strategy.scope():
         for train_index, val_index in kfold.split(data_generator.filenames):  # Modified here
             train_filenames = [data_generator.filenames[i] for i in train_index]
             train_classes = [data_generator.classes[i] for i in train_index]
+            
+            # Create a tuple of (image_path, label)
             train_data = tf.data.Dataset.from_tensor_slices((train_filenames, train_classes))
             train_data = train_data.map(preprocess_image, num_parallel_calls=tf.data.experimental.AUTOTUNE)
             train_data = train_data.cache()  # Cache the preprocessed data
@@ -105,6 +107,8 @@ with strategy.scope():
 
             val_filenames = [data_generator.filenames[i] for i in val_index]
             val_classes = [data_generator.classes[i] for i in val_index]
+            
+            # Create a tuple of (image_path, label)
             val_data = tf.data.Dataset.from_tensor_slices((val_filenames, val_classes))
             val_data = val_data.map(preprocess_image, num_parallel_calls=tf.data.experimental.AUTOTUNE)
             val_data = val_data.cache()  # Cache the preprocessed data
