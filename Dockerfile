@@ -30,6 +30,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONPATH="${PYTHONPATH}:/app/src"
 
 # Set the entry point to run main.py when the container starts
-ENTRYPOINT ["python", "-m", "src.machine_learning_from_scratch"]
+ENTRYPOINT ["python", "-m", "src.distributed_training"]
 # ENTRYPOINT ["python", "-m", "src.distributed_training_test"]
 # ENTRYPOINT [ "ls", "-la", "/root/.ssh/" ]
