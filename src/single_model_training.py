@@ -10,7 +10,6 @@ from sklearn.model_selection import KFold
 
 # Check if GPU is available and enable GPU memory growth to avoid allocation errors
 physical_devices = tf.config.list_physical_devices('GPU')
-tf.config.run_functions_eagerly(True)
 if physical_devices:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
@@ -100,7 +99,7 @@ for name, model in models:
                 tf.TensorSpec(shape=(None, data_generator.num_classes), dtype=tf.float32)
             )
         ).prefetch(buffer_size=tf.data.AUTOTUNE)
-        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'], run_eagerly=True)
         # Calculate the number of steps for each epoch
         steps_per_epoch = len(train_index) // batch_size
         validation_steps = len(val_index) // batch_size
