@@ -21,6 +21,7 @@ htop
 ### Seting up home server
 nmap -p 22 --open 192.168.1.0/24
 ssh hoang2@192.168.1.101
+ssh hoang@192.168.1.100
 sudo pt-get install -y openssh-client
 
 ### set up ssh on all machine

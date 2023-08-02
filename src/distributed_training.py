@@ -21,9 +21,12 @@ def preprocess_image(image_path, label):
     print("Image path:", image_path)
     return image, label
 # Check if GPU is available and enable GPU memory growth to avoid allocation errors
+
 physical_devices = tf.config.list_physical_devices('GPU')
 if physical_devices:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    tf.config.experimental.set_device_policy('warn')
+    tf.compat.v1.disable_eager_execution()
 
 # Define the path to the folder containing the image data
 data_directory = "/app/data-source/dementia/Data/"
