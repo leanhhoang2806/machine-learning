@@ -10,6 +10,7 @@ from sklearn.model_selection import KFold
 
 # Check if GPU is available and enable GPU memory growth to avoid allocation errors
 physical_devices = tf.config.list_physical_devices('GPU')
+tf.config.run_functions_eagerly(True)
 if physical_devices:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
