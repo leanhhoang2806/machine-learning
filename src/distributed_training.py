@@ -26,7 +26,7 @@ if physical_devices:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 # Define the path to the folder containing the image data
-data_directory = "/app/real-data-source/dementia/Data/"
+data_directory = "/app/data-source/dementia/Data/"
 
 # Specify image dimensions and batch size
 image_width, image_height = 112, 112
