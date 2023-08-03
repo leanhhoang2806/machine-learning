@@ -20,7 +20,7 @@ validation_data_dir = current_dir + '/test-data-source/dementia/test'
 BUFFER_SIZE = 10000
 BATCH_SIZE_PER_REPLICA = 64
 BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_workers
-IMG_HEIGHT, IMG_WIDTH = 28, 28
+IMG_HEIGHT, IMG_WIDTH = 56, 56
 
 # Prepare the data for training
 train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
