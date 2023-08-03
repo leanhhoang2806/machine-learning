@@ -62,54 +62,38 @@ model_architectures = [
     # Add more model architectures with names here if desired
 ]
 
-# List to store validation accuracies for each model
-validation_accuracies = []
-# Define the number of epochs
-num_epochs = 10
+# Define the model inside the strategy scope
+with strategy.scope():
+    for model_info in model_architectures:
+        model_name = model_info['name']
+        model = model_info['model']
+        print(f"Training {model_name} with architecture: {model}")
+        model = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
+            tf.keras.layers.MaxPooling2D(),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(64, activation='relu'),
+            tf.keras.layers.Dense(10, activation='softmax')
+        ])
 
-# Loop over each model architecture
-for model_info in model_architectures:
-    model_name = model_info['name']
-    model = model_info['model']
-    print(f"Training {model_name} with architecture: {model}")
-    
-    with strategy.scope():
         # Compile the model
         model.compile(loss='sparse_categorical_crossentropy',
-                      optimizer=tf.keras.optimizers.Adam(),
-                      metrics=['accuracy'])
-    
-    # Train the model
-    start_time = time.time()
-    model.fit(train_dataset, epochs=num_epochs, validation_data=validation_dataset)
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    hours = elapsed_time / 3600
-    print(f"Training {model_name} completed in {hours:.2f} hours.")
-    
-    # Evaluate the model on the validation dataset
-    _, eval_acc = model.evaluate(validation_dataset)
-    validation_accuracies.append((model_name, eval_acc))
-    print(f"{model_name} validation accuracy: {eval_acc}")
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=['accuracy'])
+        # Define the number of epochs
+        num_epochs = 10
 
-# Find the best model with the highest validation accuracy
-best_model_info = max(validation_accuracies, key=lambda x: x[1])
-best_model_name, best_model_val_acc = best_model_info
+        # Calculate the time taken for data preprocessing and training
+        start_time = time.time()
+        # Start distributed training
+        model.fit(train_dataset, epochs=num_epochs, validation_data=validation_dataset)
 
-print(f"\nBest model architecture: {best_model_name}")
-print(f"Best model validation accuracy: {best_model_val_acc}")
+        end_time = time.time()
+        elapsed_time = end_time - start_time
 
-# Calculate the time taken for data preprocessing and training
-start_time = time.time()
-# Start distributed training
-model.fit(train_dataset, epochs=num_epochs, validation_data=validation_dataset)
-
-end_time = time.time()
-elapsed_time = end_time - start_time
-
-# Convert elapsed time to hours
-hours = elapsed_time / 3600
-print(f"Training completed in {hours:.2f} hours.")
+        # Convert elapsed time to hours
+        hours = elapsed_time / 3600
+        print(f"Training completed in {hours:.2f} hours.")
 
 # Function to count the number of image files in a directory
 def count_images(directory):
