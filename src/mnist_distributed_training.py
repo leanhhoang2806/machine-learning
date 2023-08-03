@@ -1,5 +1,4 @@
 import tensorflow as tf
-import tensorflow_datasets as tfds
 
 # Define the number of workers
 num_workers = 2
@@ -7,23 +6,23 @@ num_workers = 2
 # Initialize the distributed strategy
 strategy = tf.distribute.MultiWorkerMirroredStrategy()
 
-# Load the MNIST dataset using TensorFlow Datasets (TFDS)
-datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
-mnist_train, mnist_test = datasets['train'], datasets['test']
+# Load the MNIST dataset using tf.keras.datasets.mnist
+(train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.mnist.load_data()
+
+# Normalize and expand dimensions of the images
+train_images = train_images / 255.0
+test_images = test_images / 255.0
+train_images = train_images[..., tf.newaxis]
+test_images = test_images[..., tf.newaxis]
 
 # Define some constants for the training
-BUFFER_SIZE = 10000
+BUFFER_SIZE = len(train_images)
 BATCH_SIZE_PER_REPLICA = 64
 BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_workers
 
 # Prepare the data for training
-def scale(image, label):
-    image = tf.cast(image, tf.float32)
-    image /= 255
-    return image, label
-
-train_dataset = mnist_train.map(scale).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-test_dataset = mnist_test.map(scale).batch(BATCH_SIZE)
+train_dataset = tf.data.Dataset.from_tensor_slices((train_images, train_labels)).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+test_dataset = tf.data.Dataset.from_tensor_slices((test_images, test_labels)).batch(BATCH_SIZE)
 
 # Define the model inside the strategy scope
 with strategy.scope():
