@@ -1,22 +1,50 @@
 import os
 import shutil
+import random
 
-def move_first_100_items(source_folder, destination_folder):
-    # Get a list of all items in the source folder
-    all_items = os.listdir(source_folder)
+current_dir = os.getcwd()
+# Define the path to the original data folder
+original_data_dir = current_dir + '/data-source/dementia/Data/'
 
-    # Ensure the destination folder exists; if not, create it
-    if not os.path.exists(destination_folder):
-        os.makedirs(destination_folder)
+# Define the path to the new data folder with train and test directories
+new_data_dir = current_dir + '/test-data-source/dementia/'
+train_dir = os.path.join(new_data_dir, 'train')
+test_dir = os.path.join(new_data_dir, 'test')
 
-    # Move the first 100 items to the destination folder
-    for item in all_items[:100]:
-        source_path = os.path.join(source_folder, item)
-        destination_path = os.path.join(destination_folder, item)
-        shutil.move(source_path, destination_path)
+print(f"Original data directory: {original_data_dir}")
+print(f"New data directory: {new_data_dir}")
+print(f"Train directory: {train_dir}")
+print(f"Test directory: {test_dir}")
 
-if __name__ == "__main__":
-    source_folder = "./real-data-source/Non Demented"
-    destination_folder = "./data-source/dementia/Data/Non Demented"
+# Create the train and test directories if they don't exist
+os.makedirs(train_dir, exist_ok=True)
+os.makedirs(test_dir, exist_ok=True)
 
-    move_first_100_items(source_folder, destination_folder)
+# List all the classes in the original data folder
+classes = os.listdir(original_data_dir)
+
+# Define the ratio of train data to total data
+train_data_ratio = 0.8
+
+# Loop through each class and split the images into train and test directories
+for class_name in classes:
+    class_dir = os.path.join(original_data_dir, class_name)
+    images = os.listdir(class_dir)
+    random.shuffle(images)
+    num_train = int(len(images) * train_data_ratio)
+
+    # Move images to the train directory
+    for image in images[:num_train]:
+        src_path = os.path.join(class_dir, image)
+        dst_path = os.path.join(train_dir, class_name, image)
+        os.makedirs(os.path.join(train_dir, class_name), exist_ok=True)
+        shutil.copy(src_path, dst_path)
+
+    # Move images to the test directory
+    for image in images[num_train:]:
+        src_path = os.path.join(class_dir, image)
+        dst_path = os.path.join(test_dir, class_name, image)
+        os.makedirs(os.path.join(test_dir, class_name), exist_ok=True)
+        shutil.copy(src_path, dst_path)
+
+print("Data split into train and test folders successfully.")
