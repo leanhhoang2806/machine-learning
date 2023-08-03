@@ -4,7 +4,7 @@ import random
 
 current_dir = os.getcwd()
 # Define the path to the original data folder
-original_data_dir = current_dir + '/data-source/dementia/Data/'
+original_data_dir = current_dir + '/real-data-source'
 
 # Define the path to the new data folder with train and test directories
 new_data_dir = current_dir + '/test-data-source/dementia/'
