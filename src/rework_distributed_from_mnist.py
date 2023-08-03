@@ -1,5 +1,6 @@
 import tensorflow as tf
 import os
+import time
 
 # Define the number of workers
 num_workers = 2
@@ -64,7 +65,14 @@ with strategy.scope():
 # Define the number of epochs
 num_epochs = 10
 
+# Calculate the time taken for data preprocessing and training
+start_time = time.time()
 # Start distributed training
 model.fit(train_dataset, epochs=num_epochs, validation_data=validation_dataset)
 
-# No test dataset in this case, as we have used a separate validation dataset for evaluation.
+end_time = time.time()
+elapsed_time = end_time - start_time
+
+# Convert elapsed time to hours
+hours = elapsed_time / 3600
+
