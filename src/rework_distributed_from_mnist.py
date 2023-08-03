@@ -75,4 +75,22 @@ elapsed_time = end_time - start_time
 
 # Convert elapsed time to hours
 hours = elapsed_time / 3600
+print(f"Training completed in {hours:.2f} hours.")
 
+# Function to count the number of image files in a directory
+def count_images(directory):
+    num_images = 0
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+                num_images += 1
+    return num_images
+
+
+# Count the number of images in the train directory
+num_train_images = count_images(train_data_dir)
+print(f"Number of images in the train directory: {num_train_images}")
+
+# Evaluate the model on the test dataset
+eval_loss, eval_acc = model.evaluate(validation_data_dir)
+print("Evaluation accuracy: {:.2f}%".format(eval_acc * 100))
