@@ -1,6 +1,10 @@
 import tensorflow as tf
 import os
 import time
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications import VGG16, ResNet50
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Conv2D, MaxPooling2D
 
 # Define the number of workers
 num_workers = 2
@@ -56,28 +60,36 @@ with strategy.scope():
     # Define a list of model architectures with names to search for the best model
     model_architectures = [
         {
-            'name': 'Model 1',
+            'name': 'Dense Model',
             'model': tf.keras.Sequential([
                 tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
                 tf.keras.layers.MaxPooling2D(),
                 tf.keras.layers.Flatten(),
                 tf.keras.layers.Dense(64, activation='relu'),
-                tf.keras.layers.Dense(10, activation='softmax')
+                tf.keras.layers.Dense(4, activation='softmax')
             ])
         },
-        # Add more model architectures with names here if desired
+        {
+            'name': 'VGG16 Pre-trained Model',
+            'model': Sequential([
+                        VGG16(include_top=False, weights='imagenet', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+                        GlobalAveragePooling2D(),
+                        Dense(4, activation='softmax')
+                    ])
+        },
+        {
+            'name': 'ResNet50 Pre-trained Model',
+            'model': Sequential([
+                        ResNet50(include_top=False, weights='imagenet', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+                        GlobalAveragePooling2D(),
+                        Dense(4, activation='softmax')
+                    ])
+        }
     ]
     for model_info in model_architectures:
         model_name = model_info['name']
         model = model_info['model']
         print(f"Training {model_name} with architecture: {model}")
-        # model = tf.keras.Sequential([
-        #     tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
-        #     tf.keras.layers.MaxPooling2D(),
-        #     tf.keras.layers.Flatten(),
-        #     tf.keras.layers.Dense(64, activation='relu'),
-        #     tf.keras.layers.Dense(10, activation='softmax')
-        # ])
 
         # Compile the model
         model.compile(loss='sparse_categorical_crossentropy',
@@ -97,6 +109,10 @@ with strategy.scope():
         # Convert elapsed time to hours
         hours = elapsed_time / 3600
         print(f"Training completed in {hours:.2f} hours.")
+           # Evaluate the model on the validation dataset
+        _, eval_acc = model.evaluate(validation_dataset)
+        validation_accuracies.append((model_name, eval_acc))
+        print(f"{model_name} validation accuracy: {eval_acc}")
 
 # Function to count the number of image files in a directory
 def count_images(directory):
@@ -111,3 +127,11 @@ def count_images(directory):
 # Count the number of images in the train directory
 num_train_images = count_images(train_data_dir)
 print(f"Number of images in the train directory: {num_train_images}")
+
+
+# Find the best model with the highest validation accuracy
+best_model_info = max(validation_accuracies, key=lambda x: x[1])
+best_model_name, best_model_val_acc = best_model_info
+
+print(f"\nBest model architecture: {best_model_name}")
+print(f"Best model validation accuracy: {best_model_val_acc}")
