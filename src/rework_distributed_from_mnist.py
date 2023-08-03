@@ -62,19 +62,15 @@ model_architectures = [
     # Add more model architectures with names here if desired
 ]
 
+# List to store validation accuracies for each model
+validation_accuracies = []
+
 # Define the model inside the strategy scope
 with strategy.scope():
     for model_info in model_architectures:
         model_name = model_info['name']
         model = model_info['model']
         print(f"Training {model_name} with architecture: {model}")
-        model = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
-            tf.keras.layers.MaxPooling2D(),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dense(10, activation='softmax')
-        ])
 
         # Compile the model
         model.compile(loss='sparse_categorical_crossentropy',
@@ -94,6 +90,9 @@ with strategy.scope():
         # Convert elapsed time to hours
         hours = elapsed_time / 3600
         print(f"Training completed in {hours:.2f} hours.")
+        _, eval_acc = model.evaluate(validation_dataset)
+        validation_accuracies.append((model_name, eval_acc))
+        print(f"{model_name} validation accuracy: {eval_acc}")
 
 # Function to count the number of image files in a directory
 def count_images(directory):
@@ -108,3 +107,9 @@ def count_images(directory):
 # Count the number of images in the train directory
 num_train_images = count_images(train_data_dir)
 print(f"Number of images in the train directory: {num_train_images}")
+# Find the best model with the highest validation accuracy
+best_model_info = max(validation_accuracies, key=lambda x: x[1])
+best_model_name, best_model_val_acc = best_model_info
+
+print(f"\nBest model architecture: {best_model_name}")
+print(f"Best model validation accuracy: {best_model_val_acc}")
