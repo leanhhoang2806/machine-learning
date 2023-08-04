@@ -8,6 +8,10 @@ from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Conv
 from kerastuner.tuners import RandomSearch
 import kerastuner as kt
 
+tf.random.set_seed(123)
+# set memory growth for gpu
+physical_devices = tf.config.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 # Define the number of workers
 num_workers = 2
 
@@ -99,11 +103,7 @@ def build_cnn_model(hp):
     
     return model
 
-
-start_time = time.time()
-# Initialize the tuner within the strategy.scope()
-with strategy.scope():
-    tuner = RandomSearch(
+tuner = RandomSearch(
         build_cnn_model,
         objective='val_accuracy',
         max_trials=1000,  # Number of different models to try
@@ -111,6 +111,9 @@ with strategy.scope():
         directory='tuner_directory',
         project_name='cnn_tuner'
     )
+start_time = time.time()
+# Initialize the tuner within the strategy.scope()
+with strategy.scope():
 
     # Perform the hyperparameter search within the strategy.scope()
     tuner.search(train_dataset, epochs=10, validation_data=validation_dataset)
