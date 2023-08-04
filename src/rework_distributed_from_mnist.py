@@ -89,14 +89,15 @@ with strategy.scope():
         {
             'name': 'Convo CNN Model',
             'model': Sequential([
-                        Conv2D(64, (3, 3), activation='relu', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+                        Conv2D(64 * 2, (3, 3), activation='relu', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
                         MaxPooling2D((2, 2)),
-                        Conv2D(128, (3, 3), activation='relu'),
+                        Conv2D(128 * 2, (3, 3), activation='relu'),
                         MaxPooling2D((2, 2)),
-                        Conv2D(256, (3, 3), activation='relu'),
+                        Conv2D(256 * 2, (3, 3), activation='relu'),
                         MaxPooling2D((2, 2)),
                         Flatten(),
-                        Dense(256, activation='relu'),
+                        Dense(256 * 2, activation='relu'),
+                        Dense(4 * 2, activation='relu'),
                         Dense(4, activation='softmax')
                     ]),
 
