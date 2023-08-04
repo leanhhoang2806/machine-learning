@@ -84,6 +84,21 @@ with strategy.scope():
                         GlobalAveragePooling2D(),
                         Dense(4, activation='softmax')
                     ])
+        },
+        {
+            'name': 'Convo CNN Model',
+            'model': Sequential([
+                        Conv2D(64, (3, 3), activation='relu', input_shape=(image_width, image_height, 3)),
+                        MaxPooling2D((2, 2)),
+                        Conv2D(128, (3, 3), activation='relu'),
+                        MaxPooling2D((2, 2)),
+                        Conv2D(256, (3, 3), activation='relu'),
+                        MaxPooling2D((2, 2)),
+                        Flatten(),
+                        Dense(256, activation='relu'),
+                        Dense(4, activation='softmax')
+                    ]),
+
         }
     ]
     for model_info in model_architectures:
