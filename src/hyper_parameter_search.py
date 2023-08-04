@@ -106,7 +106,7 @@ with strategy.scope():
     tuner = RandomSearch(
         build_cnn_model,
         objective='val_accuracy',
-        max_trials=10,  # Number of different models to try
+        max_trials=1000,  # Number of different models to try
         executions_per_trial=1,  # Number of executions per model
         directory='tuner_directory',
         project_name='cnn_tuner'
