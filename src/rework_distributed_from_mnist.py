@@ -60,32 +60,32 @@ validation_accuracies = []
 with strategy.scope():
     # Define a list of model architectures with names to search for the best model
     model_architectures = [
-        {
-            'name': 'Dense Model',
-            'model': tf.keras.Sequential([
-                tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
-                tf.keras.layers.MaxPooling2D(),
-                tf.keras.layers.Flatten(),
-                tf.keras.layers.Dense(64, activation='relu'),
-                tf.keras.layers.Dense(4, activation='softmax')
-            ])
-        },
-        {
-            'name': 'VGG16 Pre-trained Model',
-            'model': Sequential([
-                        VGG16(include_top=False, weights='imagenet', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
-                        GlobalAveragePooling2D(),
-                        Dense(4, activation='softmax')
-                    ])
-        },
-        {
-            'name': 'ResNet50 Pre-trained Model',
-            'model': Sequential([
-                        ResNet50(include_top=False, weights='imagenet', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
-                        GlobalAveragePooling2D(),
-                        Dense(4, activation='softmax')
-                    ])
-        },
+        # {
+        #     'name': 'Dense Model',
+        #     'model': tf.keras.Sequential([
+        #         tf.keras.layers.Conv2D(32, 3, activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
+        #         tf.keras.layers.MaxPooling2D(),
+        #         tf.keras.layers.Flatten(),
+        #         tf.keras.layers.Dense(64, activation='relu'),
+        #         tf.keras.layers.Dense(4, activation='softmax')
+        #     ])
+        # },
+        # {
+        #     'name': 'VGG16 Pre-trained Model',
+        #     'model': Sequential([
+        #                 VGG16(include_top=False, weights='imagenet', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+        #                 GlobalAveragePooling2D(),
+        #                 Dense(4, activation='softmax')
+        #             ])
+        # },
+        # {
+        #     'name': 'ResNet50 Pre-trained Model',
+        #     'model': Sequential([
+        #                 ResNet50(include_top=False, weights='imagenet', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
+        #                 GlobalAveragePooling2D(),
+        #                 Dense(4, activation='softmax')
+        #             ])
+        # },
         {
             'name': 'Convo CNN Model',
             'model': Sequential([
