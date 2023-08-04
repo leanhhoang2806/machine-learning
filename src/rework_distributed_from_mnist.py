@@ -88,7 +88,7 @@ with strategy.scope():
         {
             'name': 'Convo CNN Model',
             'model': Sequential([
-                        Conv2D(64, (3, 3), activation='relu', input_shape=(image_width, image_height, 3)),
+                        Conv2D(64, (3, 3), activation='relu', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
                         MaxPooling2D((2, 2)),
                         Conv2D(128, (3, 3), activation='relu'),
                         MaxPooling2D((2, 2)),
