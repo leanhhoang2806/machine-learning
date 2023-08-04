@@ -99,6 +99,8 @@ def build_cnn_model(hp):
     
     return model
 
+
+start_time = time.time()
 # Initialize the tuner within the strategy.scope()
 with strategy.scope():
     tuner = RandomSearch(
@@ -113,6 +115,10 @@ with strategy.scope():
     # Perform the hyperparameter search within the strategy.scope()
     tuner.search(train_dataset, epochs=10, validation_data=validation_dataset)
 
+end_time = time.time()
+
+# Calculate the total training time in hours
+total_training_time = (end_time - start_time) / 3600
 # Get the best model architecture and hyperparameters
 best_model = tuner.get_best_models(num_models=1)[0]
 best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[0]
