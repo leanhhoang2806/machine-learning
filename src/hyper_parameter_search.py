@@ -9,11 +9,6 @@ from kerastuner.tuners import RandomSearch
 import kerastuner as kt
 import sys
 
-# Open a file for writing the console output
-output_file = open('training_log.txt', 'w')
-# Redirect stdout to the output file
-sys.stdout = output_file
-
 tf.random.set_seed(123)
 # set memory growth for gpu
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -139,7 +134,3 @@ print(best_hyperparameters.values)
 best_model.fit(train_dataset, epochs=10, validation_data=validation_dataset)
 test_loss, test_accuracy = best_model.evaluate(validation_dataset)
 print(f"Test accuracy of the best model: {test_accuracy}")
-
-# Close the output file and restore original stdout
-output_file.close()
-sys.stdout = sys.__stdout__
