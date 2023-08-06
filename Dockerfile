@@ -32,5 +32,5 @@ ENV PYTHONPATH="${PYTHONPATH}:/app/src"
 # Set the entry point to run main.py when the container starts
 # ENTRYPOINT ["python", "-m", "src.distributed_training"]
 # ENTRYPOINT [ "python", "-m", "src.single_machine_training" ]
-ENTRYPOINT ["python", "-m", "src.hyper_parameter_search"]
+ENTRYPOINT ["python", "-m", "src.tf_record_analysis"]
 # ENTRYPOINT [ "ls", "-la", "/root/.ssh/" ]

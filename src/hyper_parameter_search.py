@@ -5,7 +5,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import VGG16, ResNet50
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Conv2D, MaxPooling2D
-from kerastuner_tuners import RandomSearch
+from keras_tuner import RandomSearch
 import sys
 
 tf.random.set_seed(123)

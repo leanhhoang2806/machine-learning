@@ -1,4 +1,7 @@
 
+# copy
+scp -r /Users/hoang/Documents/work/machine-learning hoang@192.168.1.100:/home/hoang/Documents/work/Machine_Learning/ && scp -r /Users/hoang/Documents/work/machine-learning hoang2@192.168.1.101:/home/hoang2/Documents/work/Machine_Learning/
+
 # Single Model training
 sudo docker stop worker-0 | true && sudo docker rm worker-0 | true && sudo docker rmi --force my_tensorflow_app && sudo docker build -t my_tensorflow_app . && sudo docker run --gpus all --name worker-0  my_tensorflow_app
 
