@@ -5,8 +5,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import VGG16, ResNet50
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D, Conv2D, MaxPooling2D
-from kerastuner.tuners import RandomSearch
-import kerastuner as kt
+from kerastuner_tuners import RandomSearch
 import sys
 
 tf.random.set_seed(123)
@@ -131,6 +130,8 @@ print("\nBest Hyperparameters:")
 print(best_hyperparameters.values)
 
 # Train the best model with the best hyperparameters
-best_model.fit(train_dataset, epochs=10, validation_data=validation_dataset)
-test_loss, test_accuracy = best_model.evaluate(validation_dataset)
-print(f"Test accuracy of the best model: {test_accuracy}")
+# Start distributed training
+with strategy.scope():
+    best_model.fit(train_dataset, epochs=10, validation_data=validation_dataset)
+    test_loss, test_accuracy = best_model.evaluate(validation_dataset)
+    print(f"Test accuracy of the best model: {test_accuracy}")
